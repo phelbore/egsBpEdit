@@ -13,6 +13,7 @@ import javax.swing.JMenuItem;
 import bp.bpFile;
 
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.awt.event.ActionEvent;
 
 public class GUI {
@@ -41,6 +42,7 @@ public class GUI {
 	 */
 	public GUI() {
 		initialize();
+		bp = new bpFile(new File("C:\\Users\\Jeremiah\\Documents\\_BP_\\steel-angled.epb"));
 	}
 
 	/**
@@ -62,16 +64,16 @@ public class GUI {
 		JMenuItem mntmOpen = new JMenuItem("Open");
 		mntmOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				openFile();
+				JFileChooser fileChooser = new JFileChooser();
+				int result = fileChooser.showOpenDialog(frmEgsBpEditor);
+				if(result == JFileChooser.APPROVE_OPTION) {
+					openFile(fileChooser.getSelectedFile());
+				}
 			}
 		});
 		mnMain.add(mntmOpen);
 	}
-	private void openFile() {
-		JFileChooser fileChooser = new JFileChooser();
-		int result = fileChooser.showOpenDialog(frmEgsBpEditor);
-		if(result == JFileChooser.APPROVE_OPTION) {
-			bp = new bpFile(fileChooser.getSelectedFile());
-		}
+	private void openFile(File f) {
+		bp = new bpFile(f);
 	}
 }
