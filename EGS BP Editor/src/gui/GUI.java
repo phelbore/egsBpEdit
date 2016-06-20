@@ -42,7 +42,6 @@ public class GUI {
 	 */
 	public GUI() {
 		initialize();
-		bp = new bpFile(new File("C:\\Users\\Jeremiah\\Documents\\_BP_\\steel-angled.epb"));
 	}
 
 	/**
