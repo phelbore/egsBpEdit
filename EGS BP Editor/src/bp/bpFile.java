@@ -13,8 +13,8 @@ import java.util.zip.ZipOutputStream;
 public class bpFile {
 
 	private File bpFile = null;
-	private byte [] bpBuffer = null;
-	private byte [] zipBuffer = null;
+	private byte [] bpBuf = null;
+	private byte [] zipBuf = null;
 	private byte [] dataBuf = null;
 	private byte [] metaBuf = null;
 	
@@ -22,23 +22,23 @@ public class bpFile {
 		bpFile = f;
 		try {
 			FileInputStream stream = new FileInputStream(f.getAbsolutePath());
-			bpBuffer = new byte [(int) f.length()];
-			stream.read(bpBuffer);
+			bpBuf = new byte [(int) f.length()];
+			stream.read(bpBuf);
 			stream.close();
-			System.out.println(parseFile());
+			System.out.println(parseBP());
 		} catch (IOException e) {
 			
 		}
 	}
 	
-	private boolean parseFile() {
-		if(!bpFile.exists() || bpBuffer.length == 0) {
+	private boolean parseBP() {
+		if(!bpFile.exists() || bpBuf.length == 0) {
 			return false;
 		}
-		zipBuffer = getZip(bpBuffer);
+		zipBuf = getZipFromBuf(bpBuf);
 		try {
 			FileOutputStream os = new FileOutputStream(bpFile.getAbsolutePath()+".zip");
-			os.write(zipBuffer);
+			os.write(zipBuf);
 			os.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -47,7 +47,7 @@ public class bpFile {
 		return false;
 	}
 
-	private byte[] getZip(byte [] bpBuf) {
+	private byte[] getZipFromBuf(byte [] bpBuf) {
 		ByteArrayOutputStream outBufStream = new ByteArrayOutputStream();
 		boolean validBP;
 		try {
@@ -57,7 +57,7 @@ public class bpFile {
 		}
 		
 		if(validBP) {
-			writeZip(dataBuf, metaBuf, outBufStream);
+			writeZipToBuf(dataBuf, metaBuf, outBufStream);
 			return outBufStream.toByteArray();
 		} else {
 			throw new Error("File not valid)");
@@ -101,7 +101,7 @@ public class bpFile {
 		return validFile;
 	}
 
-	private void writeZip(byte[] dataBuf, byte[] metaBuf, ByteArrayOutputStream outBufStream) {
+	private void writeZipToBuf(byte[] dataBuf, byte[] metaBuf, ByteArrayOutputStream outBufStream) {
 		ZipEntry metaEntry;
 		ZipEntry dataEntry;
 		metaEntry = new ZipEntry("meta");
@@ -111,8 +111,8 @@ public class bpFile {
 
 		ZipOutputStream zipOutStream = new ZipOutputStream(outBufStream);
 		try {
-			writeEntry(metaBuf, metaEntry, zipOutStream);
-			writeEntry(dataBuf, dataEntry, zipOutStream);
+			writeEntryToBuf(metaBuf, metaEntry, zipOutStream);
+			writeEntryToBuf(dataBuf, dataEntry, zipOutStream);
 			zipOutStream.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -120,10 +120,10 @@ public class bpFile {
 		}
 	}
 
-	private void writeEntry(byte[] metaBuf, ZipEntry metaEntry, ZipOutputStream zipOutStream) throws IOException {
-		zipOutStream.putNextEntry(metaEntry);
-		for(int i=0; i<metaBuf.length; i++) {
-			zipOutStream.write(metaBuf[i]);
+	private void writeEntryToBuf(byte[] entryBuf, ZipEntry zipEntry, ZipOutputStream zipOutStream) throws IOException {
+		zipOutStream.putNextEntry(zipEntry);
+		for(int i=0; i<entryBuf.length; i++) {
+			zipOutStream.write(entryBuf[i]);
 		}
 		zipOutStream.closeEntry();
 	}
