@@ -3,6 +3,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -14,9 +15,9 @@ public class bpFile {
 
 	private File bpFile = null;
 	private byte [] bpBuf = null;
-	private byte [] zipBuf = null;
 	private byte [] dataBuf = null;
 	private byte [] metaBuf = null;
+	private boolean valid = false;
 	
 	public bpFile(File f) {
 		bpFile = f;
@@ -25,13 +26,17 @@ public class bpFile {
 			bpBuf = new byte [(int) f.length()];
 			stream.read(bpBuf);
 			stream.close();
-			System.out.println(parseBP());
+			valid = parseBP();
+			if(valid) {
+				buildEPB();
+			}
 		} catch (IOException e) {
 			
 		}
 	}
 	
 	private boolean parseBP() {
+		byte [] zipBuf = null;
 		if(!bpFile.exists() || bpBuf.length == 0) {
 			return false;
 		}
@@ -40,11 +45,46 @@ public class bpFile {
 			FileOutputStream os = new FileOutputStream(bpFile.getAbsolutePath()+".zip");
 			os.write(zipBuf);
 			os.close();
+			return true;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	private boolean buildEPB() {
+		byte[] fileBuf = null;
+		byte[] outDataBuf = null;
+		ByteArrayOutputStream outBufStream = new ByteArrayOutputStream();
+		ZipEntry dataEntry;
+		dataEntry = new ZipEntry("0");
+		dataEntry.setMethod(ZipEntry.DEFLATED);
+		ZipOutputStream zipOutStream = new ZipOutputStream(outBufStream);
+
+		try {
+			writeEntryToBuf(dataBuf, dataEntry, zipOutStream);
+			zipOutStream.close();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		outDataBuf = outBufStream.toByteArray();
+		outDataBuf[0] = 0x00;
+		outDataBuf[1] = 0x00;
+		FileOutputStream os;
+		try {
+			os = new FileOutputStream(bpFile.getAbsolutePath()+"2.epb");
+			os.write(metaBuf);
+			os.write(outDataBuf);
+			os.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return true;
 	}
 
 	private byte[] getZipFromBuf(byte [] bpBuf) {
@@ -57,7 +97,7 @@ public class bpFile {
 		}
 		
 		if(validBP) {
-			writeZipToBuf(dataBuf, metaBuf, outBufStream);
+			writeZipToBuf(outBufStream);
 			return outBufStream.toByteArray();
 		} else {
 			throw new Error("File not valid)");
@@ -79,8 +119,6 @@ public class bpFile {
 				fileStart = i-3;
 			}
 			if(bpBuf[i] == 0x06 && bpBuf[i-1] == 0x05 && bpBuf[i-2] == 0x4b && bpBuf[i-3] == 0x50) {
-				bpBuf[i-2] = 0x4b;
-				bpBuf[i-3] = 0x50;
 				endCentralDirectory = true;
 			}
 			if(fileHeader == true && endCentralDirectory == true) {
@@ -101,7 +139,7 @@ public class bpFile {
 		return validFile;
 	}
 
-	private void writeZipToBuf(byte[] dataBuf, byte[] metaBuf, ByteArrayOutputStream outBufStream) {
+	private void writeZipToBuf(ByteArrayOutputStream outBufStream) {
 		ZipEntry metaEntry;
 		ZipEntry dataEntry;
 		metaEntry = new ZipEntry("meta");
@@ -126,5 +164,9 @@ public class bpFile {
 			zipOutStream.write(entryBuf[i]);
 		}
 		zipOutStream.closeEntry();
+	}
+
+	public boolean isValid() {
+		return valid;
 	}
 }
