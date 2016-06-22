@@ -3,7 +3,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -12,35 +11,65 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public class bpFile {
+	public enum FileType { EPB, ZIP }
+	
 
 	private File bpFile = null;
-	private byte [] bpBuf = null;
+	private byte [] fileBuf = null;
 	private byte [] dataBuf = null;
 	private byte [] metaBuf = null;
 	private boolean valid = false;
 	
-	public bpFile(File f) {
+	public bpFile(File f, FileType t) {
 		bpFile = f;
 		try {
 			FileInputStream stream = new FileInputStream(f.getAbsolutePath());
-			bpBuf = new byte [(int) f.length()];
-			stream.read(bpBuf);
+			fileBuf = new byte [(int) f.length()];
+			stream.read(fileBuf);
 			stream.close();
-			valid = parseBP();
-			if(valid) {
-				buildEPB();
-			}
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if(t == FileType.EPB) {
+			valid = parseBP();
+		} else if(t == FileType.ZIP) {
 			
+		}
+	}
+	
+	public boolean saveFile(File f, FileType t) {
+		if(valid) {
+			if(t == FileType.EPB) {
+				String path = f.getAbsolutePath();
+				if(!path.endsWith(".epb")) {
+					path = path + ".epb";
+				}
+			}
+			FileOutputStream os;
+			try {
+				os = new FileOutputStream(f.getAbsolutePath());
+				os.write(metaBuf);
+				os.write(buildEPBData());
+				os.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return true;
+		} else {
+			return false;
 		}
 	}
 	
 	private boolean parseBP() {
 		byte [] zipBuf = null;
-		if(!bpFile.exists() || bpBuf.length == 0) {
+		if(!bpFile.exists() || fileBuf.length == 0) {
 			return false;
 		}
-		zipBuf = getZipFromBuf(bpBuf);
+		zipBuf = getZipFromBuf(fileBuf);
+		if(zipBuf == null) {
+			return false;
+		}
 		try {
 			FileOutputStream os = new FileOutputStream(bpFile.getAbsolutePath()+".zip");
 			os.write(zipBuf);
@@ -53,9 +82,8 @@ public class bpFile {
 		return false;
 	}
 	
-	private boolean buildEPB() {
-		byte[] fileBuf = null;
-		byte[] outDataBuf = null;
+	private byte[] buildEPBData() {
+		byte[] zipDataBuf;
 		ByteArrayOutputStream outBufStream = new ByteArrayOutputStream();
 		ZipEntry dataEntry;
 		dataEntry = new ZipEntry("0");
@@ -70,21 +98,10 @@ public class bpFile {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		outDataBuf = outBufStream.toByteArray();
-		outDataBuf[0] = 0x00;
-		outDataBuf[1] = 0x00;
-		FileOutputStream os;
-		try {
-			os = new FileOutputStream(bpFile.getAbsolutePath()+"2.epb");
-			os.write(metaBuf);
-			os.write(outDataBuf);
-			os.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return true;
+		zipDataBuf = outBufStream.toByteArray();
+		zipDataBuf[0] = 0x00;
+		zipDataBuf[1] = 0x00;
+		return zipDataBuf;
 	}
 
 	private byte[] getZipFromBuf(byte [] bpBuf) {
@@ -100,7 +117,7 @@ public class bpFile {
 			writeZipToBuf(outBufStream);
 			return outBufStream.toByteArray();
 		} else {
-			throw new Error("File not valid)");
+			return null;
 		}
 	}
 

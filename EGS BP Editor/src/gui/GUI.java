@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
 
 import bp.bpFile;
+import bp.bpFile.FileType;
 
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -65,19 +66,47 @@ public class GUI {
 		JMenu mnMain = new JMenu("Main");
 		menuBar.add(mnMain);
 		
-		JMenuItem mntmOpen = new JMenuItem("Open");
-		mntmOpen.addActionListener(new ActionListener() {
+		JMenuItem mntmOpenEpb = new JMenuItem("Open EPB");
+		mntmOpenEpb.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser fileChooser = new JFileChooser();
 				int result = fileChooser.showOpenDialog(frmEgsBpEditor);
 				if(result == JFileChooser.APPROVE_OPTION) {
-					openFile(fileChooser.getSelectedFile());
+					openFile(fileChooser.getSelectedFile(), FileType.EPB);
 				}
 			}
 		});
-		mnMain.add(mntmOpen);
+		mnMain.add(mntmOpenEpb);
+		
+		JMenuItem mntmOpenZip = new JMenuItem("Open ZIP");
+		mntmOpenZip.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser fileChooser = new JFileChooser();
+				int result = fileChooser.showOpenDialog(frmEgsBpEditor);
+				if(result == JFileChooser.APPROVE_OPTION) {
+					openFile(fileChooser.getSelectedFile(), FileType.ZIP);
+				}
+			}
+		});
+		mnMain.add(mntmOpenZip);
+		
+		JMenuItem mntmSaveEpb = new JMenuItem("Save EPB");
+		mnMain.add(mntmSaveEpb);
+		mntmSaveEpb.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser fileChooser = new JFileChooser();
+				int result = fileChooser.showSaveDialog(frmEgsBpEditor);
+				if(result == JFileChooser.APPROVE_OPTION) {
+					saveFile(fileChooser.getSelectedFile(), FileType.EPB);
+				}
+			}
+		});
+		
+		JMenuItem mntmSaveZip = new JMenuItem("Save ZIP");
+		mnMain.add(mntmSaveZip);
 	}
-	private void openFile(File f) {
+	
+	private void openFile(File f, FileType t) {
 		JDialog parsing = new JDialog(frmEgsBpEditor, "Parsing file");
 		parsing.getContentPane().add(new JLabel("Parsing file, please wait"));
 		parsing.setLocationRelativeTo(frmEgsBpEditor);
@@ -85,13 +114,30 @@ public class GUI {
 		parsing.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		parsing.validate();
 		parsing.setVisible(true);
-		bp = new bpFile(f);
+		bp = new bpFile(f, t);
 		parsing.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		parsing.dispose();
 		if(bp.isValid()) {
 			JOptionPane.showMessageDialog(frmEgsBpEditor, "Parsing complete, file is valid");
 		} else {
 			JOptionPane.showMessageDialog(frmEgsBpEditor, "Parsing complete, file is not valid");
+		}
+	}
+	
+	private void saveFile(File f, FileType t) {
+		JDialog parsing = new JDialog(frmEgsBpEditor, "Saving file");
+		parsing.getContentPane().add(new JLabel("Saving file, please wait"));
+		parsing.setLocationRelativeTo(frmEgsBpEditor);
+		parsing.setSize(200, 100);
+		parsing.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		parsing.validate();
+		parsing.setVisible(true);
+		parsing.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		parsing.dispose();
+		if(bp.saveFile(f, t)) {
+			JOptionPane.showMessageDialog(frmEgsBpEditor, "File saved.");
+		} else {
+			JOptionPane.showMessageDialog(frmEgsBpEditor, "File could not be saved.");
 		}
 	}
 }
