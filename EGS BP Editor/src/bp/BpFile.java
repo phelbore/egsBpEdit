@@ -5,22 +5,23 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-public class bpFile {
+public class BpFile {
 	public enum FileType { EPB, ZIP }
-	
-
+	private MetaData meta = new MetaData();
 	private File bpFile = null;
 	private byte [] fileBuf = null;
 	private byte [] dataBuf = null;
 	private byte [] metaBuf = null;
 	private boolean valid = false;
 	
-	public bpFile(File f, FileType t) {
+	public BpFile(File f, FileType t) {
 		bpFile = f;
 		try {
 			FileInputStream stream = new FileInputStream(f.getAbsolutePath());
@@ -34,6 +35,15 @@ public class bpFile {
 			valid = parseBP();
 		} else if(t == FileType.ZIP) {
 			
+		}
+		
+		if(valid) {
+			ByteBuffer byteBuffer = ByteBuffer.allocate(2);
+			byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+			byteBuffer.put(metaBuf[132]);
+			byteBuffer.put(metaBuf[133]);
+			byteBuffer.flip();
+			meta.setBlockCount(byteBuffer.getShort());
 		}
 	}
 	

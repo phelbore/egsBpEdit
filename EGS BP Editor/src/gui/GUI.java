@@ -15,8 +15,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
 
-import bp.bpFile;
-import bp.bpFile.FileType;
+import bp.BpFile;
+import bp.BpFile.FileType;
 
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -25,7 +25,7 @@ import java.awt.event.ActionEvent;
 public class GUI {
 
 	private JFrame frmEgsBpEditor;
-	private bpFile bp;
+	private BpFile bp;
 
 	/**
 	 * Launch the application.
@@ -114,7 +114,7 @@ public class GUI {
 		parsing.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		parsing.validate();
 		parsing.setVisible(true);
-		bp = new bpFile(f, t);
+		bp = new BpFile(f, t);
 		parsing.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		parsing.dispose();
 		if(bp.isValid()) {
