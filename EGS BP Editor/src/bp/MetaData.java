@@ -1,11 +1,39 @@
 package bp;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.HashMap;
 
 public class MetaData {
 	private int blockCount;
 	private int blockRecordCount;
-	private HashMap<Integer, BlockCountRecord> blockRecords;
+	private HashMap<Integer, BlockMetaRecord> blockRecords = new HashMap<Integer, BlockMetaRecord>();
+
+	public void populate(byte[] metaBuf) {
+		setBlockCount(twoByte(metaBuf, 132));
+		setBlockRecordCount(twoByte(metaBuf, 136));
+		int blockType;
+		for(int i=0; i<getBlockRecordCount(); i++) {
+			BlockMetaRecord temp = new BlockMetaRecord();
+
+			int bufLoc = 138+(i*8);
+			blockType = Byte.toUnsignedInt(metaBuf[bufLoc]);
+			blockRecords.put(1, new BlockMetaRecord());
+			temp.setBlockType(blockType);
+			temp.setBlockCount(twoByte(metaBuf,bufLoc+4));
+			System.out.println(temp.getBlockType() + " = " + temp.getBlockCount());
+		}
+	}
+	
+	public int twoByte(byte[] buffer, int location) {
+		ByteBuffer byteBuffer = ByteBuffer.allocate(2);
+		byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+		byteBuffer.put(buffer[location]);
+		byteBuffer.put(buffer[location+1]);
+		byteBuffer.flip();
+		return byteBuffer.getShort();
+	}
+	
 	public int getBlockCount() {
 		return blockCount;
 	}
@@ -18,10 +46,10 @@ public class MetaData {
 	public void setBlockRecordCount(int blockRecordCount) {
 		this.blockRecordCount = blockRecordCount;
 	}
-	public HashMap<Integer, BlockCountRecord> getBlockRecords() {
+	public HashMap<Integer, BlockMetaRecord> getBlockRecords() {
 		return blockRecords;
 	}
-	public void setBlockRecords(HashMap<Integer, BlockCountRecord> blockRecords) {
+	public void setBlockRecords(HashMap<Integer, BlockMetaRecord> blockRecords) {
 		this.blockRecords = blockRecords;
 	}
 	

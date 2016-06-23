@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -38,12 +36,7 @@ public class BpFile {
 		}
 		
 		if(valid) {
-			ByteBuffer byteBuffer = ByteBuffer.allocate(2);
-			byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-			byteBuffer.put(metaBuf[132]);
-			byteBuffer.put(metaBuf[133]);
-			byteBuffer.flip();
-			meta.setBlockCount(byteBuffer.getShort());
+			meta.populate(metaBuf);
 		}
 	}
 	
