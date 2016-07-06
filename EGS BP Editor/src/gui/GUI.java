@@ -12,20 +12,20 @@ import net.miginfocom.swing.MigLayout;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
 
-import bp.BpFile;
-import bp.BpFile.FileType;
+import bp.ZipFile;
 
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.awt.event.ActionEvent;
 
 public class GUI {
-
+	public enum FileType { EPB, ZIP }
 	private JFrame frmEgsBpEditor;
-	private BpFile bp;
 
 	/**
 	 * Launch the application.
@@ -72,7 +72,19 @@ public class GUI {
 				JFileChooser fileChooser = new JFileChooser();
 				int result = fileChooser.showOpenDialog(frmEgsBpEditor);
 				if(result == JFileChooser.APPROVE_OPTION) {
-					openFile(fileChooser.getSelectedFile(), FileType.EPB);
+					//openFile(fileChooser.getSelectedFile(), FileType.EPB);
+					try {
+						DataInputStream  dataIS = new DataInputStream(new FileInputStream(fileChooser.getSelectedFile()));
+						byte[] buf = new byte[(int)fileChooser.getSelectedFile().length()];
+						dataIS.readFully(buf);
+						dataIS.close();
+						ZipFile zipTest = new ZipFile(buf);		
+						zipTest.notify();// TODO REMOVE ME
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
 				}
 			}
 		});
@@ -103,6 +115,15 @@ public class GUI {
 		});
 		
 		JMenuItem mntmSaveZip = new JMenuItem("Save ZIP");
+		mntmSaveZip.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser fileChooser = new JFileChooser();
+				int result = fileChooser.showSaveDialog(frmEgsBpEditor);
+				if(result == JFileChooser.APPROVE_OPTION) {
+					saveFile(fileChooser.getSelectedFile(), FileType.ZIP);
+				}
+			}
+		});
 		mnMain.add(mntmSaveZip);
 	}
 	
@@ -114,14 +135,6 @@ public class GUI {
 		parsing.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		parsing.validate();
 		parsing.setVisible(true);
-		bp = new BpFile(f, t);
-		parsing.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		parsing.dispose();
-		if(bp.isValid()) {
-			JOptionPane.showMessageDialog(frmEgsBpEditor, "Parsing complete, file is valid");
-		} else {
-			JOptionPane.showMessageDialog(frmEgsBpEditor, "Parsing complete, file is not valid");
-		}
 	}
 	
 	private void saveFile(File f, FileType t) {
@@ -134,10 +147,5 @@ public class GUI {
 		parsing.setVisible(true);
 		parsing.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		parsing.dispose();
-		if(bp.saveFile(f, t)) {
-			JOptionPane.showMessageDialog(frmEgsBpEditor, "File saved.");
-		} else {
-			JOptionPane.showMessageDialog(frmEgsBpEditor, "File could not be saved.");
-		}
 	}
 }
