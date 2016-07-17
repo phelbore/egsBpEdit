@@ -141,7 +141,6 @@ public class GUI {
 			}
 		});
 		mnMain.add(mntmSaveZip);
-		frmEgsBpEditor.setVisible(true);
 	}
 	
 	private void openFile(File f, FileType t) {
