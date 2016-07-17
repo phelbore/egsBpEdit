@@ -5,20 +5,30 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.HTreeMap;
+import org.mapdb.Serializer;
+
 public class MetaData {
+	private static DB metaDB = DBMaker.fileDB("meta.db").make();
+	private HTreeMap<String, Integer> type = metaDB.hashMap("type", Serializer.STRING, Serializer.INTEGER).create();
 	private int blockCount;
 	private int blockRecordCount;
 	private HashMap<Integer, BlockMetaRecord> blockRecords = new HashMap<Integer, BlockMetaRecord>();
 	private byte[] originalInput;
 
+	private final int blockCountOffset = 132;
+	private final int blockRecordCountOffset = 136;
+	
 	public void populate(byte[] metaBuf) {
-		setBlockCount(twoByte(metaBuf, 132));
-		setBlockRecordCount(twoByte(metaBuf, 136));
+		setBlockCount(twoByte(metaBuf, blockCountOffset));
+		setBlockRecordCount(twoByte(metaBuf, blockRecordCountOffset));
 		int blockType;
 		for(int i=0; i<getBlockRecordCount(); i++) {
 			BlockMetaRecord temp = new BlockMetaRecord();
 
-			int bufLoc = 138+(i*8);
+			int bufLoc = blockRecordCountOffset+2+(i*8);
 			blockType = Byte.toUnsignedInt(metaBuf[bufLoc]);
 			blockRecords.put(1, new BlockMetaRecord());
 			temp.setBlockType(blockType);
@@ -58,5 +68,9 @@ public class MetaData {
 
 	public byte[] getOriginalInput() {
 		return originalInput;
+	}
+
+	public HTreeMap<String, Integer> getType() {
+		return type;
 	}
 }

@@ -8,13 +8,13 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import net.miginfocom.swing.MigLayout;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.WindowConstants;
 
 import bp.ZipFile;
+import net.miginfocom.swing.MigLayout;
 
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.awt.event.ActionEvent;
+import javax.swing.JTabbedPane;
+import javax.swing.JScrollPane;
 
 public class GUI {
 	public enum FileType { EPB, ZIP }
@@ -58,7 +60,13 @@ public class GUI {
 		frmEgsBpEditor.setTitle("EGS BP Editor");
 		frmEgsBpEditor.setBounds(100, 100, 726, 559);
 		frmEgsBpEditor.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmEgsBpEditor.getContentPane().setLayout(new MigLayout("", "[]", "[]"));
+		frmEgsBpEditor.getContentPane().setLayout(new MigLayout("", "[grow]", "[grow]"));
+		
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		frmEgsBpEditor.getContentPane().add(tabbedPane, "cell 0 0,grow");
+		
+		JScrollPane scrollPane = new JScrollPane();
+		tabbedPane.addTab("New tab", null, scrollPane, null);
 
 		JMenuBar menuBar = new JMenuBar();
 		frmEgsBpEditor.setJMenuBar(menuBar);

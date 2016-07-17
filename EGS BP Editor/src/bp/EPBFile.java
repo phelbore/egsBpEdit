@@ -1,7 +1,6 @@
 package bp;
 
 public class EPBFile {
-	MetaData metaTemp = new MetaData();
 	private BlockData blocks;
 	private MetaData meta;
 	
