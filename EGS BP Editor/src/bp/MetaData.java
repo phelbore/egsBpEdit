@@ -1,5 +1,6 @@
 package bp;
 
+/*
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -9,8 +10,20 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
+*/
 
 public class MetaData {
+	private final byte[] metaData;
+
+	public MetaData(byte[] byteArray) {
+		metaData= byteArray;
+	}
+	
+	public final byte[] bytes() {
+		return metaData;
+	}
+	
+	/*
 	private static DB metaDB = DBMaker.fileDB("meta.db").make();
 	private HTreeMap<String, Integer> type = metaDB.hashMap("type", Serializer.STRING, Serializer.INTEGER).create();
 	private int blockCount;
@@ -21,6 +34,10 @@ public class MetaData {
 	private final int blockCountOffset = 132;
 	private final int blockRecordCountOffset = 136;
 	
+	public MetaData(byte[] copyOfRange) {
+		// TODO Auto-generated constructor stub
+	}
+
 	public void populate(byte[] metaBuf) {
 		setBlockCount(twoByte(metaBuf, blockCountOffset));
 		setBlockRecordCount(twoByte(metaBuf, blockRecordCountOffset));
@@ -73,4 +90,5 @@ public class MetaData {
 	public HTreeMap<String, Integer> getType() {
 		return type;
 	}
+	*/
 }
