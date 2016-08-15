@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.EventQueue;
 
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 
@@ -13,6 +14,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.WindowConstants;
 
+import bp.ShipType;
 import bp.ZipFile;
 import net.miginfocom.swing.MigLayout;
 
@@ -28,6 +30,7 @@ import javax.swing.JScrollPane;
 public class GUI {
 	public enum FileType { EPB, ZIP }
 	private JFrame frmEgsBpEditor;
+	JComboBox<ShipType> shipType;
 
 	/**
 	 * Launch the application.
@@ -67,6 +70,10 @@ public class GUI {
 		
 		JScrollPane scrollPane = new JScrollPane();
 		tabbedPane.addTab("New tab", null, scrollPane, null);
+		
+		shipType = new JComboBox<ShipType>(ShipType.values());
+		shipType.setSelectedItem(ShipType.Unknown);
+		frmEgsBpEditor.getContentPane().add(shipType);
 
 		JMenuBar menuBar = new JMenuBar();
 		frmEgsBpEditor.setJMenuBar(menuBar);
@@ -86,8 +93,8 @@ public class GUI {
 						byte[] buf = new byte[(int)fileChooser.getSelectedFile().length()];
 						dataIS.readFully(buf);
 						dataIS.close();
+						shipType.setSelectedItem(ShipType.get(buf[8]));
 						ZipFile zipTest = new ZipFile(buf);		
-						zipTest.notify();// TODO REMOVE ME
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
