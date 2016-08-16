@@ -1,29 +1,21 @@
 package cmdline;
 
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import bp.ShipType;
-import bp.ZipFile;
+import bp.EPBFile;
 
 public class egsbp {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		for (int j= 0; j<args.length; j++) {
 			File arg= new File(args[j]);
-			DataInputStream  dataIS = new DataInputStream(new FileInputStream(arg));
-			byte[] buf = new byte[(int)arg.length()];
-			dataIS.readFully(buf);
-			dataIS.close();
-			System.out.print(args[j]+": "+ShipType.get(buf[8])+" .");
-			ZipFile data = new ZipFile(buf);
+			EPBFile data = new EPBFile(arg);
 			System.out.print(".");
-			writeFile(args[j]+".meta", data.getMetaData());
+			writeFile(args[j]+".meta", data.getMetaData().bytes());
 			System.out.print(".");
-			writeFile(args[j]+".block", data.getBlockData());
+			writeFile(args[j]+".block", data.getBlockData().bytes());
 			System.out.println(".done");
 		}
 	}

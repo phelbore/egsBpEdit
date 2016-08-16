@@ -1,19 +1,13 @@
 package bp;
 
-import java.util.Arrays;
-
 public class BlockData {
-	private byte[] originalInput;
+	private final byte[] blockData;
 
-	public BlockData() {
-		
+	public BlockData(byte[] byteArray) {
+		blockData= byteArray;
 	}
 	
-	public void populate(byte[] data) {
-		originalInput = Arrays.copyOf(data, data.length);
-	}
-	
-	public byte[] getOriginalInput() {
-		return originalInput;
+	public final byte[] bytes() {
+		return blockData;
 	}
 }

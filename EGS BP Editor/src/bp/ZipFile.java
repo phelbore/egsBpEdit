@@ -1,5 +1,6 @@
 package bp;
 
+/*
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -7,8 +8,10 @@ import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+*/
 
 public class ZipFile {
+	/*
 	private byte[] zipData;
 	private byte[] metaData;
 	private byte[] blockData;
@@ -124,4 +127,5 @@ public class ZipFile {
 	public void setZipData(byte[] zipData) {
 		this.zipData = zipData;
 	}
+	*/
 }

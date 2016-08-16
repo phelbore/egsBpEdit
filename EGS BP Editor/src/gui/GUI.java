@@ -14,14 +14,12 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.WindowConstants;
 
+import bp.EPBFile;
 import bp.ShipType;
-import bp.ZipFile;
 import net.miginfocom.swing.MigLayout;
 
 import java.awt.event.ActionListener;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.JTabbedPane;
@@ -88,18 +86,14 @@ public class GUI {
 				int result = fileChooser.showOpenDialog(frmEgsBpEditor);
 				if(result == JFileChooser.APPROVE_OPTION) {
 					//openFile(fileChooser.getSelectedFile(), FileType.EPB);
+					EPBFile f;
 					try {
-						DataInputStream  dataIS = new DataInputStream(new FileInputStream(fileChooser.getSelectedFile()));
-						byte[] buf = new byte[(int)fileChooser.getSelectedFile().length()];
-						dataIS.readFully(buf);
-						dataIS.close();
-						shipType.setSelectedItem(ShipType.get(buf[8]));
-						ZipFile zipTest = new ZipFile(buf);		
+						f = new EPBFile(fileChooser.getSelectedFile());
+						shipType.setSelectedItem(ShipType.get(f.getMetaData().bytes()[8]));
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-
 				}
 			}
 		});

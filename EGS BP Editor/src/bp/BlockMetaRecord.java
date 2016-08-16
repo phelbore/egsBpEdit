@@ -1,6 +1,8 @@
 package bp;
 
 public class BlockMetaRecord {
+	
+	/*
 	//8 bytes
 	private int blockType;
 	private int blockCount;
@@ -20,4 +22,5 @@ public class BlockMetaRecord {
 	public void setBlockCount(int blockCount) {
 		this.blockCount = blockCount;
 	}
+	*/
 }
